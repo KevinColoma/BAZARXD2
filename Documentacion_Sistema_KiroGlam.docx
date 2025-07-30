@@ -1,0 +1,675 @@
+# SISTEMA DE PUNTO DE VENTA KIROGLAM
+## DOCUMENTACIÓN TÉCNICA Y ANÁLISIS DE USABILIDAD
+
+**UNIVERSIDAD DE LAS FUERZAS ARMADAS – "ESPE"**
+**DEPARTAMENTO DE CIENCIAS DE LA COMPUTACIÓN**
+**INGENIERÍA EN SOFTWARE**
+**INGENIERÍA DE USABILIDAD**
+
+**INSTRUCTOR**: ING. GERMAN ÑACATO
+**NOMBRE**: DANIEL BENALCÁZAR - DENNISON CHALACÁN
+**NRC**: 22232
+**FECHA**: 03/06/2025
+**TEMA**: FACTURACIÓN Y GESTIÓN DE INVENTARIOS DE CARTERAS
+
+---
+
+## REQUERIMIENTOS DEL SISTEMA
+
+### Requisitos Funcionales
+
+#### Gestión de Catálogo:
+El administrador podrá agregar, editar y eliminar productos en el catálogo, los que contendrán: nombre, descripción del producto, precio, imágenes, categoría y el stock disponible.
+
+#### Carrito de compras:
+Los usuarios podrán agregar productos a su carrito de compras en el cual se mostrarán los productos seleccionados, cantidad, subtotal y total de compra, así como, poder editar el número de productos o eliminar productos del carrito de compras.
+
+#### Proceso de pago:
+Los usuarios podrán realizar pagos mediante tarjeta de débito o crédito, así también con plataformas como Paypal. Se incluirá el resumen del pedido antes de confirmar el pago.
+
+#### Gestión de inventario:
+El sistema deberá reducir automáticamente el inventario cuando se complete la compra. El administrador recibirá una notificación cuando un producto esté por agotarse.
+
+#### Notificaciones:
+Los usuarios recibirán notificaciones sobre: Pago exitoso
+
+### Requisitos no Funcionales
+
+#### Rendimiento
+El sistema tardará menos de 3 segundos en registrar los productos en el inventario.
+
+#### Escalabilidad
+El sistema en un futuro podrá agregar nuevos productos de ser necesario.
+
+#### Seguridad
+Los pagos se realizarán mediante transacciones seguras.
+
+#### Usabilidad
+La interfaz deberá ser intuitiva y responsiva.
+
+#### Compatibilidad
+El sistema debe ser compatible con todo tipo de dispositivos (ordenadores o dispositivos móviles).
+
+#### Disponibilidad
+El sistema no debería tener restricciones de uso una vez instalado en el dispositivo.
+
+#### Mantenimiento
+El sistema deberá ser modular para facilitar el mantenimiento.
+
+#### Estilo
+El estilo estará inspirado en distintas aplicaciones que sean similares.
+
+---
+
+## ANÁLISIS DE TAREAS ESPECÍFICO
+
+### Tabla de Análisis HTA Detallado
+
+| TAREA | P | H | T | C | E | OBSERVACIONES |
+|-------|---|---|---|---|---|---------------|
+| T1: Iniciar sesión en el sistema | 0.95 | Bajo | 15s | Bajo | Bajo | Login simple con validación en tiempo real |
+| T2: Navegar al módulo de inventario | 0.98 | Muy Bajo | 5s | Muy Bajo | Muy Bajo | Menú principal intuitivo con iconos |
+| T3: Buscar producto en inventario | 0.92 | Bajo | 8s | Bajo | Medio | Barra de búsqueda en tiempo real |
+| T4: Agregar nuevo producto | 0.85 | Medio | 45s | Medio | Medio | Modal con formulario estructurado |
+| T5: Editar información de producto | 0.88 | Medio | 30s | Medio | Bajo | Formulario pre-llenado con validaciones |
+| T6: Navegar al punto de venta | 0.98 | Muy Bajo | 5s | Muy Bajo | Muy Bajo | Acceso directo desde menú principal |
+| T7: Buscar producto para vender | 0.90 | Bajo | 10s | Bajo | Medio | Grid visual con búsqueda instantánea |
+| T8: Agregar producto al carrito | 0.95 | Muy Bajo | 3s | Muy Bajo | Muy Bajo | Un clic para agregar |
+| T9: Modificar cantidad en carrito | 0.92 | Bajo | 8s | Bajo | Bajo | Controles +/- intuitivos |
+| T10: Eliminar producto del carrito | 0.94 | Muy Bajo | 5s | Muy Bajo | Muy Bajo | Botón X claramente visible |
+| T11: Procesar venta | 0.90 | Bajo | 12s | Bajo | Medio | Confirmación antes de proceder |
+| T12: Completar datos de facturación | 0.88 | Medio | 60s | Medio | Medio | Formulario con validaciones obligatorias |
+| T13: Generar factura final | 0.92 | Bajo | 15s | Bajo | Bajo | Confirmación visual con modal |
+| T14: Cerrar sesión | 0.96 | Muy Bajo | 8s | Muy Bajo | Muy Bajo | Modal de confirmación elegante |
+
+### Definiciones de Variables
+
+#### Probabilidad (P)
+- 0.96-1.0: Muy Alta
+- 0.90-0.95: Alta
+- 0.80-0.89: Media
+- 0.70-0.79: Baja
+- <0.70: Muy Baja
+
+#### Complejidad (H)
+- Muy Bajo: Tareas de 1 clic, navegación simple
+- Bajo: Tareas de 2-3 pasos, búsquedas
+- Medio: Formularios, validaciones
+- Alto: Procesos complejos multi-paso
+- Muy Alto: Tareas técnicas avanzadas
+
+#### Tiempo Estimado (T)
+Tiempo promedio para completar la tarea exitosamente
+
+#### Carga Cognitiva (C)
+- Muy Bajo: No requiere memoria ni análisis
+- Bajo: Decisiones simples
+- Medio: Requiere recordar información
+- Alto: Análisis complejo requerido
+
+#### Probabilidad de Error (E)
+- Muy Bajo: <5% errores
+- Bajo: 5-15% errores
+- Medio: 15-25% errores
+- Alto: >25% errores
+
+---
+
+## ÍNDICE
+
+1. **ARQUITECTURA GENERAL DEL SISTEMA**
+2. **TECNOLOGÍAS UTILIZADAS**
+3. **ESTRUCTURA DEL FRONTEND**
+4. **ESTRUCTURA DEL BACKEND**
+5. **FLUJO DE DATOS Y COMUNICACIÓN**
+6. **SEGURIDAD IMPLEMENTADA**
+7. **HEURÍSTICAS DE DISEÑO DE NIELSEN APLICADAS**
+8. **CARACTERÍSTICAS DE USABILIDAD**
+9. **BASE DE DATOS**
+10. **ANÁLISIS DE TAREAS (HTA)**
+
+---
+
+## 1. ARQUITECTURA GENERAL DEL SISTEMA
+
+### 1.1 Patrón Arquitectónico
+- **Tipo**: Cliente-Servidor con API REST
+- **Frontend**: Single Page Application (SPA) con navegación por páginas
+- **Backend**: API RESTful con Node.js y Express
+- **Base de Datos**: MongoDB (NoSQL)
+- **Comunicación**: HTTP/HTTPS con JSON
+
+### 1.2 Separación de Responsabilidades
+- **Frontend**: Interfaz de usuario, validaciones cliente, experiencia visual
+- **Backend**: Lógica de negocio, validaciones servidor, gestión de datos
+- **Base de Datos**: Persistencia de información
+
+---
+
+## 2. TECNOLOGÍAS UTILIZADAS
+
+### 2.1 Frontend
+- **HTML5**: Estructura semántica de páginas
+- **CSS3**: Estilos y diseño visual
+- **JavaScript ES6+**: Lógica del cliente
+- **Bootstrap 5.3**: Framework CSS responsivo
+- **Font Awesome 6**: Iconografía
+- **Fetch API**: Comunicación HTTP asíncrona
+
+### 2.2 Backend
+- **Node.js**: Entorno de ejecución JavaScript
+- **Express.js**: Framework web para Node.js
+- **MongoDB**: Base de datos NoSQL
+- **Mongoose**: ODM para MongoDB
+- **JWT (jsonwebtoken)**: Autenticación y autorización
+- **bcrypt**: Hash seguro de contraseñas
+- **CORS**: Configuración de cross-origin requests
+
+### 2.3 Herramientas de Desarrollo
+- **Visual Studio Code**: IDE principal
+- **MongoDB Compass**: Visualización de base de datos
+- **Postman**: Testing de API REST
+
+---
+
+## 3. ESTRUCTURA DEL FRONTEND
+
+### 3.1 Páginas HTML
+
+#### 3.1.1 index.html - Página de Login
+**Propósito**: Autenticación de administradores
+**Características**:
+- Formulario de login con validaciones
+- Integración con API de autenticación
+- Manejo de tokens JWT
+- Redirección automática post-login
+
+#### 3.1.2 menu.html - Dashboard Principal
+**Propósito**: Navegación central del sistema
+**Características**:
+- Botones de acceso a módulos principales
+- Protección de acceso (verificación de token)
+- Modal de cierre de sesión
+- Diseño de cards con iconos
+
+#### 3.1.3 vender.html - Módulo de Ventas
+**Propósito**: Gestión de carrito de compras
+**Características**:
+- Grid de productos con imágenes
+- Carrito de compras interactivo
+- Búsqueda en tiempo real
+- Validaciones de stock
+- Cálculo automático de totales
+
+#### 3.1.4 facturacion.html - Generación de Facturas
+**Propósito**: Procesamiento de ventas y facturación
+**Características**:
+- Formulario de datos del cliente
+- Resumen de productos del carrito
+- Cálculos de IVA y totales
+- Descuento automático de stock
+- Modal de confirmación
+
+#### 3.1.5 inventario.html - Gestión de Productos
+**Propósito**: CRUD de productos del inventario
+**Características**:
+- Tabla responsiva de productos
+- Formularios de creación/edición
+- Barra de búsqueda con filtrado
+- Validaciones de campos obligatorios
+
+### 3.2 Estilos CSS
+
+#### 3.2.1 style.css - Hoja de Estilos Principal
+**Características**:
+- **Paleta de Colores**: Rosa elegante (#8d5c5c, #b28b8b, #f8eaea)
+- **Tipografía**: Fuentes legibles y jerárquicas
+- **Responsividad**: Breakpoints para diferentes dispositivos
+- **Componentes**: Cards, botones, formularios, modales
+- **Animaciones**: Transiciones suaves y efectos visuales
+
+### 3.3 JavaScript Modules
+
+#### 3.3.1 login.js - Autenticación
+```javascript
+Funciones principales:
+- validarCredenciales()
+- guardarToken()
+- verificarAcceso()
+- redirigirUsuario()
+```
+
+#### 3.3.2 vender.js - Módulo de Ventas
+```javascript
+Funciones principales:
+- cargarProductos()
+- agregarAlCarrito()
+- calcularTotales()
+- procesarVenta()
+- validarStock()
+```
+
+#### 3.3.3 facturacion.js - Facturación
+```javascript
+Funciones principales:
+- cargarDatosCarrito()
+- validarFormulario()
+- generarFactura()
+- descontarStock()
+- confirmarVenta()
+```
+
+#### 3.3.4 inventario.js - Gestión de Inventario
+```javascript
+Funciones principales:
+- listarProductos()
+- crearProducto()
+- editarProducto()
+- eliminarProducto()
+- buscarProductos()
+```
+
+---
+
+## 4. ESTRUCTURA DEL BACKEND
+
+### 4.1 Servidor Principal (server.js)
+```javascript
+Configuraciones:
+- Puerto: 4000
+- Base de datos: MongoDB
+- Middlewares: CORS, express.json()
+- Rutas: /api/admin, /api/carteras
+```
+
+### 4.2 Modelos de Datos
+
+#### 4.2.1 Admin.js - Usuario Administrador
+```javascript
+Schema: {
+  usuario: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  contraseña: {
+    type: String,
+    required: true
+  }
+}
+```
+
+#### 4.2.2 Cartera.js - Productos
+```javascript
+Schema: {
+  descripcion: {
+    type: String,
+    required: true
+  },
+  precio: {
+    type: Number,
+    required: true
+  },
+  stock: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  imagen: {
+    type: String,
+    default: ''
+  }
+}
+```
+
+### 4.3 Rutas API
+
+#### 4.3.1 admin.js - Autenticación
+```javascript
+POST /api/admin/login
+- Validación de credenciales
+- Hash de contraseñas con bcrypt
+- Generación de JWT
+- Respuesta con token
+```
+
+#### 4.3.2 carteras.js - Gestión de Productos
+```javascript
+GET /api/carteras - Listar todos los productos
+POST /api/carteras - Crear nuevo producto
+PUT /api/carteras/:id - Actualizar producto
+DELETE /api/carteras/:id - Eliminar producto
+POST /api/carteras/descontar-stock - Descontar stock masivo
+```
+
+---
+
+## 5. FLUJO DE DATOS Y COMUNICACIÓN
+
+### 5.1 Proceso de Autenticación
+```
+1. Usuario ingresa credenciales → Frontend (login.js)
+2. POST /api/admin/login → Backend (admin.js)
+3. Validación con bcrypt → Base de datos
+4. Generación JWT ← Backend
+5. Token almacenado ← Frontend (localStorage)
+6. Redirección a menu.html
+```
+
+### 5.2 Gestión de Productos
+```
+1. Carga inicial → GET /api/carteras → Backend
+2. Productos mostrados ← Frontend (grid)
+3. Búsqueda/filtrado → JavaScript local
+4. CRUD operations → API endpoints → MongoDB
+```
+
+### 5.3 Proceso de Venta
+```
+1. Selección productos → Carrito (localStorage)
+2. Facturación → Validaciones frontend
+3. POST /api/carteras/descontar-stock → Backend
+4. Actualización stock → MongoDB
+5. Confirmación → Frontend (modal)
+```
+
+---
+
+## 6. SEGURIDAD IMPLEMENTADA
+
+### 6.1 Autenticación y Autorización
+- **JWT Tokens**: Sesiones seguras sin estado
+- **bcrypt**: Hash de contraseñas con salt
+- **Verificación de tokens**: Middleware de protección
+- **Expiración de sesiones**: Tokens con tiempo de vida
+
+### 6.2 Validaciones
+- **Frontend**: Validación inmediata de formularios
+- **Backend**: Validación de datos en servidor
+- **Base de datos**: Schemas con restricciones
+- **Sanitización**: Prevención de inyecciones
+
+### 6.3 Comunicación
+- **CORS**: Configuración de dominios permitidos
+- **HTTPS**: Recomendado para producción
+- **Headers de seguridad**: Content-Type, Authorization
+
+---
+
+## 7. HEURÍSTICAS DE DISEÑO DE NIELSEN APLICADAS
+
+### 7.1 Visibilidad del Estado del Sistema
+**Implementación**:
+- **Notificaciones visuales** para cada acción (agregar al carrito, facturar, etc.)
+- **Indicadores de stock** (disponible, bajo, agotado)
+- **Estados de botones** (habilitado/deshabilitado según contexto)
+- **Feedback inmediato** en formularios y validaciones
+- **Carga de datos** con mensajes informativos
+
+**Ejemplo**: En vender.js, cuando se agrega un producto al carrito:
+```javascript
+mostrarNotificacion(`${producto.descripcion} agregado al carrito`);
+```
+
+### 7.2 Coincidencia entre el Sistema y el Mundo Real
+**Implementación**:
+- **Terminología comercial** familiar (carrito, factura, inventario)
+- **Iconos intuitivos** (🛒 carrito, 📄 factura, 📦 inventario)
+- **Flujo natural** de venta (seleccionar → carrito → facturar)
+- **Cálculos automáticos** de IVA y totales como en el mundo real
+
+### 7.3 Control y Libertad del Usuario
+**Implementación**:
+- **Funciones de deshacer**: Eliminar productos del carrito
+- **Confirmaciones** antes de acciones irreversibles
+- **Navegación libre** entre módulos
+- **Limpiar carrito** completo cuando sea necesario
+- **Cancelar operaciones** en modales
+
+**Ejemplo**: En vender.js, función para limpiar carrito:
+```javascript
+if (confirm('¿Está seguro de que desea limpiar el carrito?')) {
+    carrito = [];
+    actualizarCarrito();
+}
+```
+
+### 7.4 Consistencia y Estándares
+**Implementación**:
+- **Paleta de colores** uniforme en todo el sistema
+- **Patrones de navegación** consistentes
+- **Estructura de formularios** similar en todos los módulos
+- **Convenciones de botones** (colores para acciones específicas)
+- **Layout responsivo** coherente
+
+### 7.5 Prevención de Errores
+**Implementación**:
+- **Validaciones en tiempo real** en formularios
+- **Campos obligatorios** claramente marcados
+- **Validación de stock** antes de agregar al carrito
+- **Límites en cantidades** según disponibilidad
+- **Confirmaciones** para acciones críticas
+
+**Ejemplo**: Validación de stock en vender.js:
+```javascript
+if (itemExistente.cantidad < producto.stock) {
+    itemExistente.cantidad++;
+} else {
+    mostrarAlerta('No hay suficiente stock disponible');
+    return;
+}
+```
+
+### 7.6 Reconocimiento en Lugar de Recordación
+**Implementación**:
+- **Búsqueda visual** con imágenes de productos
+- **Autocompletado** en campos de búsqueda
+- **Historial visual** en el carrito
+- **Datos pre-llenados** cuando es posible
+- **Navegación visual** con iconos descriptivos
+
+### 7.7 Flexibilidad y Eficiencia de Uso
+**Implementación**:
+- **Búsqueda rápida** de productos
+- **Atajos de teclado** en formularios
+- **Filtrado en tiempo real**
+- **Carga asíncrona** de datos
+- **Operaciones en lote** (descuento masivo de stock)
+
+### 7.8 Diseño Estético y Minimalista
+**Implementación**:
+- **Información relevante** prominente
+- **Elementos secundarios** minimizados
+- **Espaciado adecuado** entre componentes
+- **Colores** no intrusivos pero informativos
+- **Tipografía** clara y legible
+
+### 7.9 Ayudar a Reconocer, Diagnosticar y Recuperarse de Errores
+**Implementación**:
+- **Mensajes de error claros** y específicos
+- **Códigos de color** para diferentes tipos de mensaje
+- **Sugerencias de solución** en mensajes de error
+- **Recuperación automática** cuando es posible
+- **Logs de errores** para debugging
+
+**Ejemplo**: Manejo de errores en cargarProductos():
+```javascript
+catch (error) {
+    console.error('Error de conexión:', error);
+    mostrarError('Error de conexión con el servidor');
+}
+```
+
+### 7.10 Ayuda y Documentación
+**Implementación**:
+- **Tooltips** en botones y campos
+- **Placeholders** descriptivos en formularios
+- **Títulos de página** claros
+- **Navegación intuitiva** que reduce necesidad de ayuda
+- **Mensajes informativos** contextuales
+
+---
+
+## 8. CARACTERÍSTICAS DE USABILIDAD
+
+### 8.1 Responsive Design
+- **Bootstrap Grid System** para diferentes dispositivos
+- **Breakpoints**: xs, sm, md, lg, xl
+- **Componentes adaptativos** que se reorganizan según pantalla
+- **Tipografía escalable** con rem y em
+- **Imágenes responsivas** con max-width: 100%
+
+### 8.2 Accesibilidad
+- **Contraste adecuado** en colores de texto y fondo
+- **Atributos alt** en imágenes
+- **Labels descriptivos** en formularios
+- **Navegación por teclado** en elementos interactivos
+- **Jerarquía semántica** con headers apropiados
+
+### 8.3 Performance
+- **Carga asíncrona** de datos con async/await
+- **Debouncing** en búsquedas para reducir requests
+- **Lazy loading** considerado para imágenes
+- **Minificación** recomendada para producción
+- **CDN** para librerías externas (Bootstrap, Font Awesome)
+
+### 8.4 Robustez
+- **Manejo de errores** en todas las operaciones async
+- **Fallbacks** para imágenes no disponibles
+- **Validaciones duales** (cliente y servidor)
+- **Recuperación de estado** con localStorage
+- **Timeouts** en requests HTTP
+
+---
+
+## 9. BASE DE DATOS
+
+### 9.1 Diseño de Esquemas
+
+#### 9.1.1 Colección: admins
+```javascript
+{
+  _id: ObjectId("..."),
+  usuario: "admin",
+  contraseña: "$2b$10$..." // Hash bcrypt
+}
+```
+
+#### 9.1.2 Colección: carteras
+```javascript
+{
+  _id: ObjectId("..."),
+  descripcion: "Bolso de cuero negro",
+  precio: 25.50,
+  stock: 10,
+  imagen: "https://images.unsplash.com/..."
+}
+```
+
+### 9.2 Operaciones Principales
+- **Create**: Inserción de nuevos productos/usuarios
+- **Read**: Consultas con filtros y ordenamiento
+- **Update**: Modificación de stock, precios, datos
+- **Delete**: Eliminación lógica de productos
+
+### 9.3 Índices y Optimización
+- **Índice único** en usuario de admin
+- **Índices compuestos** para búsquedas frecuentes
+- **Agregación** para reportes y estadísticas
+- **Validación de esquemas** con Mongoose
+
+---
+
+## 10. ANÁLISIS DE TAREAS (HTA)
+
+### 10.1 Variables de Análisis
+
+#### 10.1.1 Variable P (Probabilidad)
+- **Login exitoso**: 0.95 (alta probabilidad)
+- **Agregar producto al carrito**: 0.90
+- **Completar facturación**: 0.85
+- **Error de conexión**: 0.10 (baja probabilidad)
+
+#### 10.1.2 Variable H (Tiempo de ejecución)
+- **Login**: 30 segundos promedio
+- **Buscar y agregar producto**: 45 segundos
+- **Generar factura completa**: 120 segundos
+- **Gestionar inventario**: 60 segundos por producto
+
+#### 10.1.3 Variable T (Tiempo total de tarea)
+- **Venta completa**: 3-5 minutos
+- **Actualización de inventario**: 2-3 minutos
+- **Consulta de productos**: 1 minuto
+
+#### 10.1.4 Variable C (Coste de errores)
+- **Error en facturación**: Alto (pérdida de venta)
+- **Error en stock**: Medio (inconsistencia de datos)
+- **Error de login**: Bajo (reintento simple)
+
+#### 10.1.5 Variable E (Experiencia requerida)
+- **Usuario novato**: Puede usar el sistema con 1 hora de capacitación
+- **Usuario experto**: Puede completar tareas 40% más rápido
+- **Administrador**: Requiere conocimiento adicional de gestión
+
+### 10.2 Tareas Principales Analizadas
+
+#### 10.2.1 Proceso de Venta
+```
+1. Autenticación (P=0.95, H=30s)
+2. Navegación a ventas (P=0.98, H=10s)
+3. Búsqueda de productos (P=0.90, H=20s)
+4. Selección y cantidad (P=0.95, H=15s)
+5. Revisión de carrito (P=0.85, H=30s)
+6. Proceso de facturación (P=0.85, H=120s)
+7. Confirmación final (P=0.95, H=15s)
+```
+
+#### 10.2.2 Gestión de Inventario
+```
+1. Acceso al módulo (P=0.98, H=15s)
+2. Búsqueda de producto (P=0.90, H=25s)
+3. Edición de datos (P=0.85, H=45s)
+4. Validación y guardado (P=0.90, H=20s)
+```
+
+### 10.3 Recomendaciones de Mejora
+
+#### 10.3.1 Optimizaciones Inmediatas
+- **Autocompletado** en búsquedas para reducir tiempo H
+- **Validaciones preventivas** para aumentar probabilidad P
+- **Shortcuts de teclado** para usuarios expertos
+- **Guardado automático** para reducir coste C de errores
+
+#### 10.3.2 Mejoras a Mediano Plazo
+- **Dashboard de métricas** para monitoreo de tareas
+- **Sistema de ayuda contextual**
+- **Personalización de interface** según experiencia E
+- **Análisis de patrones de uso** para optimización
+
+---
+
+## CONCLUSIONES
+
+El sistema KiroGlam implementa una arquitectura moderna y escalable que combina las mejores prácticas de desarrollo web con principios sólidos de usabilidad. La aplicación de las heurísticas de Nielsen asegura una experiencia de usuario intuitiva y eficiente, mientras que el análisis HTA permite identificar áreas de mejora continua.
+
+### Fortalezas del Sistema:
+- Arquitectura clara y mantenible
+- Seguridad robusta con JWT y bcrypt
+- Interfaz responsiva y accesible
+- Validaciones comprehensivas
+- Manejo de errores robusto
+
+### Áreas de Mejora Identificadas:
+- Implementación de sistema de ayuda contextual
+- Optimización de performance con lazy loading
+- Análisis de métricas de uso
+- Personalización basada en experiencia del usuario
+
+El sistema está preparado para un entorno de producción y puede escalar según las necesidades del negocio, manteniendo siempre el foco en la experiencia del usuario y la eficiencia operacional.
+
+---
+
+**Fecha de Documentación**: 10 de julio de 2025
+**Versión**: 1.0
+**Autor**: Sistema de Documentación Automática
+**Proyecto**: KiroGlam POS System
