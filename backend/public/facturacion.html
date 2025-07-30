@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Facturación</title>
+    <style>
+      .fecha-input {
+        background: #f8eaea;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 2px 4px 8px #e2cfcf;
+        font-size: 18px;
+        color: #6d4c4c;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+      .modal-confirmacion {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0; top: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.3);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-confirmacion .modal-content {
+        background: #fff6f6;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        padding: 32px 40px;
+        text-align: center;
+      }
+      .modal-confirmacion .modal-content h4 {
+        color: #8d5c5c;
+        margin-bottom: 18px;
+      }
+      .modal-confirmacion .btn {
+        background: #f8eaea;
+        color: #8d5c5c;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 2px 4px 8px #e2cfcf;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 10px 32px;
+        margin-top: 18px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .modal-confirmacion .btn:hover {
+        background: #e2cfcf;
+        color: #6d4c4c;
+      }
+    </style>
+</head>
+<body>
+  <div class="factura-container">
+    <div class="factura-header">
+      <h2>KiroGlam</h2>
+      <span class="factura-num">Factura:1123654</span>
+    </div>
+    <table class="tabla-factura">
+      <thead>
+        <tr>
+          <th>Descripcion</th>
+          <th>Cantidad</th>
+          <th class="text-right">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-factura">
+        <!-- Aquí se llenarán los productos seleccionados -->
+      </tbody>
+    </table>
+    <table class="resumen" id="resumen-factura" style="width:100%;">
+      <!-- Aquí se llenará el resumen -->
+    </table>
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="info-label">Nombre:</div>
+        <input type="text" class="form-control">
+        <div class="info-label">Cédula/RUC:</div>
+        <input type="text" class="form-control">
+        <div class="info-label">Fecha:</div>
+        <div id="fecha-factura" class="fecha-label" style="background:#f8eaea;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:18px;color:#6d4c4c;box-shadow:2px 4px 8px #e2cfcf;width:100%;font-weight:bold;"></div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-label">Dirección:</div>
+        <input type="text" class="form-control">
+        <div class="info-label">Teléfono:</div>
+        <input type="text" class="form-control">
+      </div>
+    </div>
+    <button class="btn btn-factura" id="btn-generar-factura">Generar Factura</button>
+    <a href="vender.html" class="btn btn-regresar mt-3" style="background: #f8eaea; color: #8d5c5c; border: 2px solid #e2cfcf; padding: 12px 24px; border-radius: 8px; font-weight: bold; box-shadow: 2px 4px 8px #e2cfcf; text-decoration: none; display: block; width: fit-content; margin: 0 auto;">Regresar al Punto de Venta</a>
+  </div>
+
+  <!-- Modal de confirmación -->
+  <div class="modal-confirmacion" id="modal-confirmacion">
+    <div class="modal-content" style="max-width:340px;min-width:260px;padding:32px 24px;background:#fff6f6;box-shadow:0 4px 16px #e2cfcf;border-radius:16px;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width:60px;height:60px;background:#e2cfcf;box-shadow:2px 4px 8px #e2cfcf;">
+          <span class="fa-stack fa-2x">
+            <i class="fas fa-circle fa-stack-2x" style="color:#e2cfcf;"></i>
+            <i class="fas fa-check fa-stack-1x" style="color:#8d5c5c;"></i>
+          </span>
+        </div>
+        <h4 style="color:#8d5c5c;font-weight:bold;font-size:1.3rem;margin-bottom:10px;">¡Factura generada!</h4>
+        <p style="color:#6d4c4c;font-size:1rem;margin-bottom:0;">La factura ha sido registrada correctamente.</p>
+        <button class="btn mt-4" id="btn-cerrar-modal" style="background:#8d5c5c;color:white;padding:8px 28px;border-radius:8px;font-weight:bold;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/facturacion.js"></script>
+</body>
+</html>

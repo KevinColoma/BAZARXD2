@@ -9,20 +9,29 @@ app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, '../Fronted')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB conectado'))
   .catch(err => console.error(err));
 
-// Rutas
+// Ruta de prueba
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Servidor KiroGlam funcionando correctamente',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Rutas de la API
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/carteras', require('./routes/carteras'));
 
 // Ruta para servir el frontend
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Fronted/index.html'));
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 const PORT = process.env.PORT || 4000;

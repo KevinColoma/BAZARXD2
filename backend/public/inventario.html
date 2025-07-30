@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Inventario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <h2 class="text-center mt-4 mb-4" style="color:#8d5c5c; font-weight:bold;">INVENTARIO</h2>
+    
+    <!-- Barra de búsqueda y botón agregar -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" style="background:#8d5c5c; color:white;">
+              <i class="fas fa-search"></i>
+            </span>
+          </div>
+          <input type="text" class="form-control" id="search-inventario" placeholder="Buscar productos...">
+        </div>
+      </div>
+      <div class="col-md-6 text-right">
+        <button class="btn btn-primary" id="btn-nueva-cartera"><i class="fas fa-plus"></i> Agregar Cartera</button>
+      </div>
+    </div>
+    
+    <table class="table table-inventario">
+      <thead>
+        <tr>
+          <th>IMAGEN</th>
+          <th>DESCRIPCION</th>
+          <th>PRECIO</th>
+          <th>STOCK</th>
+          <th>MANEJO DE PRODUCTOS</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-carteras">
+        <!-- Las filas se llenarán dinámicamente con JS -->
+      </tbody>
+    </table>
+    
+    <!-- Mensaje cuando no hay resultados -->
+    <div id="no-results" class="text-center" style="display: none; padding: 40px;">
+      <i class="fas fa-search" style="font-size: 3rem; color: #b28b8b; margin-bottom: 1rem;"></i>
+      <h5 style="color: #8d5c5c;">No se encontraron productos</h5>
+      <p style="color: #b28b8b;">Intenta con otro término de búsqueda</p>
+    </div>
+    
+    <div class="text-center">
+      <a href="menu.html" class="btn btn-regresar">Regresar</a>
+    </div>
+    
+  </div>
+  <script src="JS/api-config.js"></script>
+  <script src="JS/inventario.js"></script>
+</body>
+</html>

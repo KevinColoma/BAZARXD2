@@ -5,3 +5,5 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 *.log
+# No ignorar la carpeta public ya que contiene el frontend
+# public/
