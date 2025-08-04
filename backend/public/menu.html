@@ -6,10 +6,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Menú Principal</title>
+    <title>Menú Principal - KiroGlam</title>
 </head>
 <body>
   <div class="menu-container">
+    <!-- Información del usuario autenticado -->
+    <div class="user-info mb-3" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">
+      <img class="user-photo" src="" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;">
+      <div style="display: inline-block; vertical-align: middle;">
+        <div class="user-name" style="font-weight: bold; color: #2e7d32;">Cargando...</div>
+        <div class="user-email" style="font-size: 0.9em; color: #666;">Verificando autenticación...</div>
+      </div>
+    </div>
+    
     <h2 class="text-center mb-4" style="color:#8d5c5c; font-weight:bold; letter-spacing:1px; font-size: 2.5rem;">
       <i class="fas fa-store-alt"></i> KIRO GLAM
     </h2>
@@ -21,13 +30,16 @@
         <i class="fas fa-shopping-cart"></i> VENDER
       </a>
     
-      <button class="btn btn-menu" onclick="cerrarSesion()" style="background: #dc3545; color: white;">
+      <button class="btn btn-menu logout-btn" style="background: #dc3545; color: white;">
         <i class="fas fa-sign-out-alt"></i> CERRAR SESIÓN
       </button>
     </div>
   </div>
+  
+  <!-- Incluir el manager de autenticación -->
+  <script src="JS/auth-manager.js"></script>
   <script>
-    // Verificar si el usuario está logueado
+    // El auth-manager se encarga automáticamente de verificar la autenticación
     if (!localStorage.getItem('token')) {
       window.location.href = 'index.html';
     }

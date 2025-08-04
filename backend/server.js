@@ -1,12 +1,31 @@
+// Cargar variables de entorno PRIMERO
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const session = require('express-session');
+const passport = require('./config/oauth');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Configurar sesiones para OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'kiroglam-secret-key-2025',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+  }
+}));
+
+// Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,6 +47,9 @@ app.get('/health', (req, res) => {
 // Rutas de la API
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/carteras', require('./routes/carteras'));
+
+// Rutas de autenticación OAuth
+app.use('/auth', require('./routes/auth'));
 
 // Ruta para servir el frontend
 app.get('*', (req, res) => {
