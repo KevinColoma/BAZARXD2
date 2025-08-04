@@ -17,8 +17,19 @@ router.get('/google',
 
 // Callback de Google OAuth
 router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login.html' }),
+    (req, res, next) => {
+        console.log('🔄 Callback recibido de Google');
+        console.log('Query params:', req.query);
+        console.log('Entorno:', process.env.NODE_ENV);
+        next();
+    },
+    passport.authenticate('google', { 
+        failureRedirect: '/login.html',
+        failureMessage: true 
+    }),
     (req, res) => {
+        console.log('✅ Autenticación exitosa');
+        console.log('Usuario:', req.user);
         // Autenticación exitosa
         res.redirect('/menu.html');
     }
@@ -29,6 +40,19 @@ router.get('/user', requireAuth, (req, res) => {
     res.json({
         success: true,
         user: req.user
+    });
+});
+
+// Ruta de debug para verificar configuración
+router.get('/debug', (req, res) => {
+    res.json({
+        environment: process.env.NODE_ENV,
+        hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+        hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.NODE_ENV === 'production' 
+            ? "https://kiroglam.onrender.com/auth/google/callback"
+            : "http://localhost:4000/auth/google/callback",
+        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false
     });
 });
 
