@@ -9,6 +9,10 @@ const session = require('express-session');
 const passport = require('./config/oauth');
 
 const app = express();
+
+// Configurar Express para confiar en proxies (necesario para Render)
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 
@@ -19,10 +23,10 @@ app.use(session({
   saveUninitialized: false,
   name: 'kiroglam.sid', // Nombre personalizado para la cookie
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // true en producción
     httpOnly: true, // Proteger contra XSS
     maxAge: 24 * 60 * 60 * 1000, // 24 horas
-    sameSite: 'lax' // Permitir cookies en redirects
+    sameSite: 'lax' // lax es más compatible
   }
 }));
 
