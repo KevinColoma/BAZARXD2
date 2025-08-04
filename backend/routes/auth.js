@@ -50,7 +50,7 @@ router.get('/debug', (req, res) => {
         hasClientId: !!process.env.GOOGLE_CLIENT_ID,
         hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.NODE_ENV === 'production' 
-            ? "https://kiroglam.onrender.com/auth/google/callback"
+            ? "https://bazarxd.onrender.com/auth/google/callback"
             : "http://localhost:4000/auth/google/callback",
         isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false
     });

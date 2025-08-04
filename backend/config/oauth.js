@@ -12,7 +12,7 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'tu-client-id-aqui',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'tu-client-secret-aqui',
     callbackURL: process.env.NODE_ENV === 'production' 
-        ? "https://kiroglam.onrender.com/auth/google/callback"
+        ? "https://bazarxd.onrender.com/auth/google/callback"
         : "http://localhost:4000/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
