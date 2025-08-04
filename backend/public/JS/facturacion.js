@@ -208,8 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (response.ok) {
           // Stock actualizado exitosamente, mostrar modal
           modal.style.display = 'flex';
-          // Limpiar carrito de localStorage
-          localStorage.removeItem('factura');
+          // NO limpiar carrito aquí - se limpiará después de generar el PDF
         } else {
           const error = await response.json();
           mostrarModalError('Error al actualizar stock: ' + (error.error || 'Error desconocido'));
@@ -223,7 +222,7 @@ window.addEventListener('DOMContentLoaded', () => {
           // Error de red - permitir facturar sin actualizar stock
           if (confirm('No se puede conectar al servidor. ¿Desea generar la factura sin actualizar el stock?')) {
             modal.style.display = 'flex';
-            localStorage.removeItem('factura');
+            // NO limpiar carrito aquí - se limpiará después de generar el PDF
           }
         } else {
           mostrarModalError('Error de conexión: ' + error.message);
@@ -236,6 +235,8 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     btnCerrar.addEventListener('click', () => {
       modal.style.display = 'none';
+      // Generar PDF automáticamente al cerrar el modal de confirmación
+      generarFacturaPDF();
     });
     // Cerrar modal al hacer click fuera del contenido
     modal.addEventListener('click', (e) => {
@@ -243,3 +244,228 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// Función para generar PDF de la factura
+function generarFacturaPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Obtener datos de la factura
+  const productos = JSON.parse(localStorage.getItem('factura')) || [];
+  console.log('Productos para PDF:', productos); // Debug: verificar productos
+  
+  // Verificar que hay productos
+  if (!productos || productos.length === 0) {
+    alert('Error: No se encontraron productos para generar el PDF.');
+    return;
+  }
+  
+  const fecha = document.getElementById('fecha-factura').textContent;
+  
+  // Obtener datos del cliente
+  const inputs = document.querySelectorAll('.form-control');
+  const nombre = inputs[0].value;
+  const cedula = inputs[1].value;
+  const direccion = inputs[2].value;
+  const telefono = inputs[3].value;
+  
+  // Colores del tema
+  const colorPrimario = [46, 125, 50]; // Verde elegante
+  const colorSecundario = [76, 175, 80]; // Verde claro
+  const colorTexto = [33, 33, 33]; // Gris oscuro
+  const colorGris = [117, 117, 117]; // Gris medio
+  
+  // === ENCABEZADO ELEGANTE ===
+  // Fondo del encabezado
+  doc.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+  doc.rect(0, 0, 210, 45, 'F');
+  
+  // Logo simulado (círculo con iniciales)
+  doc.setFillColor(255, 255, 255);
+  doc.circle(25, 22, 8, 'F');
+  doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('KG', 25, 25, { align: 'center' });
+  
+  // Título de la empresa
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.text('KIROGLAM', 40, 20);
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Sistema de Gestión Empresarial', 40, 28);
+  doc.text('Belleza • Estilo • Calidad', 40, 34);
+  
+  // FACTURA en el lado derecho
+  doc.setFontSize(28);
+  doc.setFont('helvetica', 'bold');
+  doc.text('FACTURA', 150, 25);
+  
+  // === INFORMACIÓN DE LA FACTURA ===
+  doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+  doc.setFontSize(10);
+  const numeroFactura = `FAC-${Date.now().toString().slice(-8)}`;
+  
+  // Caja para información de factura
+  doc.setDrawColor(colorGris[0], colorGris[1], colorGris[2]);
+  doc.setLineWidth(0.5);
+  doc.rect(140, 50, 50, 25);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('No. Factura:', 142, 58);
+  doc.text('Fecha:', 142, 66);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.text(numeroFactura, 164, 58);
+  doc.text(fecha, 164, 66);
+  
+  // === INFORMACIÓN DEL CLIENTE ===
+  let yPos = 85;
+  
+  // Título de sección
+  doc.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+  doc.rect(20, yPos - 5, 170, 8, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('INFORMACIÓN DEL CLIENTE', 22, yPos);
+  
+  yPos += 15;
+  doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+  doc.setFontSize(10);
+  
+  // Datos del cliente en dos columnas
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nombre:', 22, yPos);
+  doc.text('Cédula:', 22, yPos + 8);
+  doc.text('Dirección:', 22, yPos + 16);
+  doc.text('Teléfono:', 22, yPos + 24);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.text(nombre, 45, yPos);
+  doc.text(cedula, 45, yPos + 8);
+  doc.text(direccion, 45, yPos + 16);
+  doc.text(telefono, 45, yPos + 24);
+  
+  // === TABLA DE PRODUCTOS ===
+  yPos += 40;
+  
+  // Encabezado de tabla elegante
+  doc.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+  doc.rect(20, yPos - 3, 170, 12, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DESCRIPCIÓN', 22, yPos + 3);
+  doc.text('CANT.', 120, yPos + 3);
+  doc.text('PRECIO UNIT.', 140, yPos + 3);
+  doc.text('TOTAL', 170, yPos + 3);
+  
+  yPos += 12;
+  
+  // Productos con alternancia de colores
+  doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  
+  let subtotal = 0;
+  productos.forEach((prod, index) => {
+    const cantidad = prod.cantidad || 1;
+    const totalProd = prod.precio * cantidad;
+    subtotal += totalProd;
+    
+    // Fila alternada
+    if (index % 2 === 0) {
+      doc.setFillColor(248, 249, 250);
+      doc.rect(20, yPos - 2, 170, 8, 'F');
+    }
+    
+    // Limitar descripción
+    const descripcion = prod.descripcion.length > 45 
+      ? prod.descripcion.substring(0, 42) + '...' 
+      : prod.descripcion;
+    
+    doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+    doc.text(descripcion, 22, yPos + 2);
+    doc.text(cantidad.toString(), 124, yPos + 2, { align: 'center' });
+    doc.text(`$${prod.precio.toFixed(2)}`, 154, yPos + 2, { align: 'center' });
+    doc.text(`$${totalProd.toFixed(2)}`, 174, yPos + 2, { align: 'center' });
+    
+    yPos += 8;
+  });
+  
+  // Línea separadora elegante
+  yPos += 5;
+  doc.setDrawColor(colorGris[0], colorGris[1], colorGris[2]);
+  doc.setLineWidth(1);
+  doc.line(120, yPos, 190, yPos);
+  
+  // === RESUMEN FINANCIERO ===
+  yPos += 10;
+  const impuesto = subtotal * 0.12;
+  const total = subtotal + impuesto;
+  
+  // Caja para totales
+  doc.setFillColor(250, 250, 250);
+  doc.rect(120, yPos - 5, 70, 25, 'F');
+  doc.setDrawColor(colorGris[0], colorGris[1], colorGris[2]);
+  doc.rect(120, yPos - 5, 70, 25);
+  
+  doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  
+  doc.text('Subtotal:', 125, yPos);
+  doc.text(`$${subtotal.toFixed(2)}`, 185, yPos, { align: 'right' });
+  
+  yPos += 6;
+  doc.text('IVA (12%):', 125, yPos);
+  doc.text(`$${impuesto.toFixed(2)}`, 185, yPos, { align: 'right' });
+  
+  yPos += 8;
+  // Total destacado
+  doc.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+  doc.rect(120, yPos - 3, 70, 8, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('TOTAL:', 125, yPos + 2);
+  doc.text(`$${total.toFixed(2)}`, 185, yPos + 2, { align: 'right' });
+  
+  // === PIE DE PÁGINA ELEGANTE ===
+  yPos = 260;
+  
+  // Línea decorativa
+  doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+  doc.setLineWidth(2);
+  doc.line(20, yPos, 190, yPos);
+  
+  yPos += 10;
+  doc.setTextColor(colorGris[0], colorGris[1], colorGris[2]);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('¡Gracias por confiar en nosotros!', 105, yPos, { align: 'center' });
+  
+  yPos += 6;
+  doc.setFontSize(8);
+  doc.text('Este documento es una factura válida generada electrónicamente', 105, yPos, { align: 'center' });
+  
+  yPos += 4;
+  doc.text('KiroGlam - Sistema de Gestión Empresarial | www.kiroglam.com', 105, yPos, { align: 'center' });
+  
+  // Descargar el PDF
+  const nombreArchivo = `Factura_${numeroFactura}_${nombre.replace(/\s+/g, '_')}.pdf`;
+  doc.save(nombreArchivo);
+  
+  // Limpiar carrito DESPUÉS de generar el PDF
+  localStorage.removeItem('factura');
+  
+  // Redirigir al usuario de vuelta al punto de venta
+  setTimeout(() => {
+    window.location.href = 'vender.html';
+  }, 1000);
+}
