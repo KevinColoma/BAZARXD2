@@ -6,24 +6,247 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Iniciar Sesión</title>
+    <title>KiroGlam - Sistema de Gestión</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .intro-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-intro {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .title {
+            color: #2e7d32;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+        
+        .description {
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #4285f4, #357ae8);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            color: #4caf50;
+            font-size: 1.5rem;
+        }
+        
+        .loading-dots {
+            display: none;
+            color: #4285f4;
+            margin-top: 20px;
+        }
+        
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+        }
+        
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+        
+        @media (max-width: 576px) {
+            .intro-container {
+                margin: 20px;
+                padding: 40px 30px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="loginForm">
-    <h1 class="text-center mb-4" style="color:#8d5c5c;">KIRO GLAM</h1>
-    <form>
-        <div class="form-group">
-            <label for="username">USUARIO:</label>
-            <input type="text" id="username" name="username" class="form-control" required>
+    <div class="intro-container">
+        <div class="logo-intro">
+            KG
         </div>
-        <div class="form-group">
-            <label for="password">CONTRASEÑA:</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+        
+        <h1 class="title">KIRO GLAM</h1>
+        <p class="subtitle">Sistema de Gestión Empresarial</p>
+        
+        <p class="description">
+            Bienvenido al sistema integral de gestión para tu negocio. 
+            Administra inventario, procesa ventas y genera facturas profesionales 
+            de manera sencilla y eficiente.
+        </p>
+        
+        <a href="/login.html" class="start-btn" id="startBtn">
+            <i class="fas fa-rocket"></i>
+            Comenzar Ahora
+        </a>
+        
+        <div class="loading-dots" id="loadingDots">
+            Redirigiendo<span>.</span><span>.</span><span>.</span>
         </div>
-        <button type="submit" class="btn btn-login btn-block">INGRESAR</button>
-    </form>
-  </div>
-  <script src="JS/api-config.js"></script>
-  <script src="JS/login.js"></script>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-boxes feature-icon"></i>
+                <span>Gestión de<br>Inventario</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shopping-cart feature-icon"></i>
+                <span>Punto de<br>Venta</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-file-invoice feature-icon"></i>
+                <span>Facturación<br>Digital</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <span>Acceso<br>Seguro</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar si ya está autenticado
+        fetch('/auth/user')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ya está autenticado, redirigir directamente al menu
+                    showLoading();
+                    setTimeout(() => {
+                        window.location.href = '/menu.html';
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                // No está autenticado, mostrar botón para ir al login
+                console.log('Usuario no autenticado, mostrando página de intro');
+            });
+        
+        // Manejar click del botón
+        document.getElementById('startBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading();
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 800);
+        });
+        
+        function showLoading() {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('loadingDots').style.display = 'block';
+        }
+        
+        // Auto-redirigir después de 10 segundos si no hace nada
+        setTimeout(() => {
+            if (document.getElementById('startBtn').style.display !== 'none') {
+                document.getElementById('startBtn').click();
+            }
+        }, 10000);
+    </script>
 </body>
 </html>
