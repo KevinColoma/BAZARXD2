@@ -97,7 +97,17 @@ router.get('/debug', (req, res) => {
         callbackURL: process.env.NODE_ENV === 'production' 
             ? "https://bazarxd.onrender.com/auth/google/callback"
             : "http://localhost:4000/auth/google/callback",
-        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false
+        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+        sessionConfig: {
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000
+        },
+        currentSession: {
+            id: req.sessionID,
+            data: req.session
+        }
     });
 });
 

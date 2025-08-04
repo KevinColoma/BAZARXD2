@@ -18,6 +18,17 @@ class AuthManager {
     async checkAuthStatus() {
         try {
             console.log('🔍 Verificando estado de autenticación...');
+            
+            // Primero verificar la configuración del servidor
+            const debugResponse = await fetch('/auth/debug', {
+                credentials: 'same-origin'
+            });
+            
+            if (debugResponse.ok) {
+                const debugData = await debugResponse.json();
+                console.log('📋 [DEBUG] Configuración del servidor:', debugData);
+            }
+            
             const response = await fetch('/auth/user', {
                 credentials: 'same-origin', // Importante para incluir cookies de sesión
                 headers: {
