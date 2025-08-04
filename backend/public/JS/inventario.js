@@ -78,14 +78,14 @@ function configurarBusqueda() {
 // Cargar datos al inicio
 document.addEventListener('DOMContentLoaded', cargarCarteras);
 
-// Formulario para agregar cartera
+// Formulario para agregar producto
 function mostrarFormularioCartera() {
   const formHtml = `
     <div class="modal fade show" id="modal-cartera" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-modal="true" style="display:block; background:rgba(0,0,0,0.3);">
       <div class="modal-dialog" role="document" style="max-width: 600px;">
         <div class="modal-content" style="border-radius: 18px; box-shadow: 0 8px 32px 0 rgba(141,92,92,0.25);">
           <div class="modal-header" style="background: linear-gradient(90deg, #8d5c5c 60%, #c7a7a7 100%); color: #fff; border-top-left-radius: 18px; border-top-right-radius: 18px;">
-            <h5 class="modal-title" id="modalLabel"><i class="fas fa-plus-circle"></i> Agregar Cartera</h5>
+            <h5 class="modal-title" id="modalLabel"><i class="fas fa-plus-circle"></i> Agregar producto</h5>
             <button type="button" class="close" id="cerrar-modal" aria-label="Cerrar" style="color:#fff; opacity:1;">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -150,19 +150,19 @@ function mostrarFormularioCartera() {
       document.getElementById('modal-cartera').remove();
       cargarCarteras(); // Recargar datos sin reload de página
     } else {
-      alert('Error al agregar cartera');
+      alert('Error al agregar producto');
     }
   };
 }
 
-// Modal para editar cartera con Bootstrap
+// Modal para editar producto con Bootstrap
 function mostrarFormularioEditarCartera(cartera) {
   const formHtml = `
     <div class="modal fade show" id="modal-editar-cartera" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel" aria-modal="true" style="display:block; background:rgba(0,0,0,0.3);">
       <div class="modal-dialog" role="document" style="max-width: 600px;">
         <div class="modal-content" style="border-radius: 18px; box-shadow: 0 8px 32px 0 rgba(141,92,92,0.25);">
           <div class="modal-header" style="background: linear-gradient(90deg, #c7a7a7 0%, #8d5c5c 100%); color: #fff; border-top-left-radius: 18px; border-top-right-radius: 18px;">
-            <h5 class="modal-title" id="modalEditLabel"><i class="fas fa-pen-to-square"></i> Editar Cartera</h5>
+            <h5 class="modal-title" id="modalEditLabel"><i class="fas fa-pen-to-square"></i> Editar producto</h5>
             <button type="button" class="close" id="cerrar-modal-editar" aria-label="Cerrar" style="color:#fff; opacity:1;">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -232,40 +232,40 @@ function mostrarFormularioEditarCartera(cartera) {
       document.getElementById('modal-editar-cartera').remove();
       cargarCarteras(); // Recargar datos sin reload de página
     } else {
-      alert('Error al actualizar cartera');
+      alert('Error al actualizar producto');
     }
   };
 }
 
-// Función para editar cartera
+// Función para editar producto
 async function editarCartera(id) {
   try {
-    const res = await apiRequest('/carteras');
+    const res = await fetch('http://localhost:4000/api/carteras');
     const data = await res.json();
     const cartera = data.find(c => c._id === id);
     if (cartera) {
       mostrarFormularioEditarCartera(cartera);
     }
   } catch (error) {
-    alert('Error al cargar los datos de la cartera');
+    alert('Error al cargar los datos de la producto');
   }
 }
 
-// Función para eliminar cartera
+// Función para eliminar producto
 async function eliminarCartera(id) {
-  if (confirm('¿Seguro que deseas eliminar esta cartera?')) {
+  if (confirm('¿Seguro que deseas eliminar este producto?')) {
     try {
-      const res = await apiRequest(`/carteras/${id}`, {
+      const res = await fetch(`http://localhost:4000/api/carteras/${id}`, {
         method: 'DELETE'
       });
       if(res.ok) {
         alert('Cartera eliminada');
         cargarCarteras(); // Recargar datos sin reload de página
       } else {
-        alert('Error al eliminar cartera');
+        alert('Error al eliminar producto');
       }
     } catch (error) {
-      alert('Error de conexión al eliminar cartera');
+      alert('Error de conexión al eliminar producto');
     }
   }
 }
@@ -281,10 +281,10 @@ document.addEventListener('click', function(e) {
         if (cartera) mostrarFormularioEditarCartera(cartera);
       });
   }
-  // Evento para eliminar cartera
+  // Evento para eliminar producto
   if (e.target.closest('.fa-trash')) {
     const id = e.target.closest('.fa-trash').getAttribute('data-id');
-    if (confirm('¿Seguro que deseas eliminar esta cartera?')) {
+    if (confirm('¿Seguro que deseas eliminar este producto?')) {
       fetch(`http://localhost:4000/api/carteras/${id}`, {
         method: 'DELETE'
       })
@@ -293,7 +293,7 @@ document.addEventListener('click', function(e) {
           alert('Cartera eliminada');
           location.reload();
         } else {
-          alert('Error al eliminar cartera');
+          alert('Error al eliminar producto');
         }
       });
     }
