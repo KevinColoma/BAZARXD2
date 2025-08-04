@@ -38,19 +38,31 @@ router.get('/google/callback',
         session: true
     }),
     (req, res) => {
-        console.log('✅ Autenticación exitosa');
-        console.log('Usuario autenticado:', req.user);
-        console.log('Sesión ID:', req.sessionID);
-        console.log('¿Está autenticado?:', req.isAuthenticated());
+        console.log('✅ [CALLBACK] Autenticación exitosa');
+        console.log('  - Usuario autenticado:', req.user);
+        console.log('  - Sesión ID:', req.sessionID);
+        console.log('  - ¿Está autenticado?:', req.isAuthenticated());
+        console.log('  - Datos de sesión completos:', JSON.stringify(req.session, null, 2));
         
         // Verificar que el usuario existe antes de redirigir
         if (!req.user) {
-            console.log('❌ No hay usuario en la sesión');
+            console.log('❌ [CALLBACK] No hay usuario en la sesión');
             return res.redirect('/login.html?error=no_user');
         }
         
-        // Autenticación exitosa
-        res.redirect('/menu.html');
+        // Forzar guardar la sesión antes de redirigir
+        req.session.save((err) => {
+            if (err) {
+                console.log('❌ [CALLBACK] Error guardando sesión:', err);
+                return res.redirect('/login.html?error=session_save_failed');
+            }
+            
+            console.log('💾 [CALLBACK] Sesión guardada exitosamente');
+            console.log('  - Sesión después de guardar:', JSON.stringify(req.session, null, 2));
+            
+            // Autenticación exitosa
+            res.redirect('/menu.html');
+        });
     }
 );
 

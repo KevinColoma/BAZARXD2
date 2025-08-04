@@ -16,29 +16,40 @@ passport.use(new GoogleStrategy({
         : "http://localhost:4000/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('🔍 [GOOGLE-STRATEGY] Procesando perfil de Google:', {
+            id: profile.id,
+            displayName: profile.displayName,
+            email: profile.emails?.[0]?.value,
+            photo: profile.photos?.[0]?.value
+        });
+        
         // Aquí puedes guardar el usuario en tu base de datos si quieres
         const user = {
             id: profile.id,
             name: profile.displayName,
-            email: profile.emails[0].value,
-            photo: profile.photos[0].value,
-            provider: 'google'
+            email: profile.emails?.[0]?.value || 'Sin email',
+            photo: profile.photos?.[0]?.value || '',
+            provider: 'google',
+            accessToken: accessToken // Guardar token si lo necesitas
         };
         
-        console.log('Usuario autenticado:', user);
+        console.log('✅ [GOOGLE-STRATEGY] Usuario creado:', user);
         return done(null, user);
     } catch (error) {
+        console.error('❌ [GOOGLE-STRATEGY] Error:', error);
         return done(error, null);
     }
 }));
 
 // Serializar usuario para la sesión
 passport.serializeUser((user, done) => {
+    console.log('📝 [PASSPORT] Serializando usuario:', user);
     done(null, user);
 });
 
 // Deserializar usuario de la sesión
 passport.deserializeUser((user, done) => {
+    console.log('📖 [PASSPORT] Deserializando usuario:', user);
     done(null, user);
 });
 
