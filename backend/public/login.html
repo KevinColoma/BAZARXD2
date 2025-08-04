@@ -202,19 +202,19 @@
             window.history.replaceState({}, document.title, window.location.pathname);
         }
         
-        // Verificar si ya está autenticado
-        fetch('/auth/user')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Ya está autenticado, redirigir al menu
-                    window.location.href = '/menu.html';
-                }
-            })
-            .catch(error => {
-                // No está autenticado, mostrar página de login
-                console.log('Usuario no autenticado');
-            });
+        // Verificar si ya está autenticado - DESHABILITADO para evitar bucles
+        // fetch('/auth/user')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             // Ya está autenticado, redirigir al menu
+        //             window.location.href = '/menu.html';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         // No está autenticado, mostrar página de login
+        //         console.log('Usuario no autenticado');
+        //     });
         
         function loginTradicional() {
             alert('Funcionalidad de login tradicional aún no implementada.\nPor favor usa "Continuar con Google"');

@@ -39,10 +39,8 @@
   <!-- Incluir el manager de autenticación -->
   <script src="JS/auth-manager.js"></script>
   <script>
-    // El auth-manager se encarga automáticamente de verificar la autenticación
-    if (!localStorage.getItem('token')) {
-      window.location.href = 'index.html';
-    }
+    // El auth-manager se encarga automáticamente de verificar la autenticación OAuth
+    // Removida verificación obsoleta de localStorage que causaba bucles
     
     // Crear modal de confirmación bonito
     function crearModalConfirmacion() {
