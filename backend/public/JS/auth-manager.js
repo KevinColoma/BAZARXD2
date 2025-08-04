@@ -7,26 +7,48 @@ class AuthManager {
     }
     
     async init() {
+        // Dar tiempo a que la sesión OAuth se establezca
+        console.log('⏳ Inicializando AuthManager...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         await this.checkAuthStatus();
         this.setupAuthUI();
     }
     
     async checkAuthStatus() {
         try {
-            const response = await fetch('/auth/user');
+            console.log('🔍 Verificando estado de autenticación...');
+            const response = await fetch('/auth/user', {
+                credentials: 'same-origin', // Importante para incluir cookies de sesión
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+            
+            if (response.status === 401) {
+                console.log('❌ No autenticado (401)');
+                this.redirectToLogin();
+                return false;
+            }
+            
             const data = await response.json();
+            console.log('📋 Datos recibidos:', data);
             
             if (data.success && data.user) {
+                console.log('✅ Usuario autenticado:', data.user.name);
                 this.user = data.user;
                 this.isAuthenticated = true;
                 this.updateUserInfo();
                 return true;
             } else {
+                console.log('❌ No hay usuario válido en la respuesta');
                 this.redirectToLogin();
                 return false;
             }
         } catch (error) {
-            console.error('Error verificando autenticación:', error);
+            console.error('💥 Error verificando autenticación:', error);
             this.redirectToLogin();
             return false;
         }
@@ -35,7 +57,11 @@ class AuthManager {
     redirectToLogin() {
         // Solo redirigir si no estamos ya en la página de login
         if (!window.location.pathname.includes('login.html')) {
-            window.location.href = '/login.html';
+            console.log('🔄 Redirigiendo a login...');
+            // Agregar un pequeño retraso para evitar redirecciones inmediatas
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 500);
         }
     }
     

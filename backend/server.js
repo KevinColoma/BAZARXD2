@@ -17,9 +17,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'kiroglam-secret-key-2025',
   resave: false,
   saveUninitialized: false,
+  name: 'kiroglam.sid', // Nombre personalizado para la cookie
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    httpOnly: true, // Proteger contra XSS
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    sameSite: 'lax' // Permitir cookies en redirects
   }
 }));
 

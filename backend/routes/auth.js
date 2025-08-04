@@ -55,11 +55,37 @@ router.get('/google/callback',
 );
 
 // Ruta para obtener información del usuario autenticado
-router.get('/user', requireAuth, (req, res) => {
-    res.json({
-        success: true,
-        user: req.user
-    });
+router.get('/user', (req, res) => {
+    console.log('🔍 Verificación de usuario solicitada');
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('Sesión ID:', req.sessionID);
+    console.log('¿Está autenticado?:', req.isAuthenticated ? req.isAuthenticated() : 'función no disponible');
+    console.log('Usuario en sesión:', req.user);
+    console.log('Cookies:', req.headers.cookie);
+    console.log('Session data:', JSON.stringify(req.session, null, 2));
+    
+    if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+        console.log('✅ Usuario autenticado encontrado');
+        res.json({
+            success: true,
+            user: req.user,
+            nodeEnv: process.env.NODE_ENV,
+            sessionID: req.sessionID
+        });
+    } else {
+        console.log('❌ Usuario no autenticado');
+        res.status(401).json({ 
+            error: 'No autenticado',
+            details: {
+                hasSession: !!req.session,
+                sessionID: req.sessionID,
+                isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+                hasUser: !!req.user,
+                nodeEnv: process.env.NODE_ENV,
+                cookies: req.headers.cookie
+            }
+        });
+    }
 });
 
 // Ruta de debug para verificar configuración
