@@ -58,10 +58,12 @@ app.use('/api/carteras', require('./routes/carteras'));
 // Rutas de autenticación OAuth
 app.use('/auth', require('./routes/auth'));
 
-// Ruta para servir el frontend
-app.get('*', (req, res) => {
+// Ruta específica para la página de inicio (solo la raíz)
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+
+// Las demás rutas (login.html, menu.html, etc.) son servidas por express.static
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
