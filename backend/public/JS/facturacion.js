@@ -31,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Función para verificar si el servidor está disponible
   async function verificarConexionServidor() {
     try {
-      const response = await fetch('http://localhost:4000/api/carteras', {
+      const response = await apiRequest('/carteras', {
         method: 'GET',
         signal: AbortSignal.timeout(3000) // 3 segundos timeout
       });
@@ -197,11 +197,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
 
-        const response = await fetch('http://localhost:4000/api/carteras/descontar-stock', {
+        const response = await apiRequest('/carteras/descontar-stock', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify({ productos: productosParaDescuento }),
           signal: controller.signal
         });

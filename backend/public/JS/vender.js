@@ -22,7 +22,7 @@ function configurarEventos() {
 // Cargar productos desde la API
 async function cargarProductos() {
     try {
-        const response = await fetch('http://localhost:4000/api/carteras');
+        const response = await apiRequest('/carteras');
         if (response.ok) {
             productos = await response.json();
             

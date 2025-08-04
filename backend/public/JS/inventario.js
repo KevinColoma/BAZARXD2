@@ -5,7 +5,7 @@ let carterasFiltradas = [];
 // Cargar carteras desde el backend y mostrarlas en la tabla
 async function cargarCarteras() {
   try {
-    const res = await fetch('http://localhost:4000/api/carteras');
+    const res = await apiRequest('/carteras');
     carteras = await res.json();
     carterasFiltradas = [...carteras];
     mostrarCarteras(carterasFiltradas);
@@ -140,7 +140,7 @@ function mostrarFormularioCartera() {
       stock: parseInt(form.stock.value),
       imagen: form.imagen.value
     };
-    const res = await fetch('http://localhost:4000/api/carteras', {
+    const res = await apiRequest('/carteras', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(cartera)
@@ -222,7 +222,7 @@ function mostrarFormularioEditarCartera(cartera) {
       stock: parseInt(form.stock.value),
       imagen: form.imagen.value
     };
-    const res = await fetch(`http://localhost:4000/api/carteras/${cartera._id}`, {
+    const res = await apiRequest(`/carteras/${cartera._id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(carteraEditada)
@@ -240,7 +240,7 @@ function mostrarFormularioEditarCartera(cartera) {
 // Función para editar cartera
 async function editarCartera(id) {
   try {
-    const res = await fetch('http://localhost:4000/api/carteras');
+    const res = await apiRequest('/carteras');
     const data = await res.json();
     const cartera = data.find(c => c._id === id);
     if (cartera) {
@@ -255,7 +255,7 @@ async function editarCartera(id) {
 async function eliminarCartera(id) {
   if (confirm('¿Seguro que deseas eliminar esta cartera?')) {
     try {
-      const res = await fetch(`http://localhost:4000/api/carteras/${id}`, {
+      const res = await apiRequest(`/carteras/${id}`, {
         method: 'DELETE'
       });
       if(res.ok) {
