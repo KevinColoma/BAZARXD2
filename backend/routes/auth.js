@@ -21,15 +21,34 @@ router.get('/google/callback',
         console.log('🔄 Callback recibido de Google');
         console.log('Query params:', req.query);
         console.log('Entorno:', process.env.NODE_ENV);
+        console.log('URL completa:', req.url);
+        
+        // Verificar si hay errores en los query params
+        if (req.query.error) {
+            console.log('❌ Error en OAuth:', req.query.error);
+            console.log('Descripción:', req.query.error_description);
+            return res.redirect('/login.html?error=' + encodeURIComponent(req.query.error));
+        }
+        
         next();
     },
     passport.authenticate('google', { 
-        failureRedirect: '/login.html',
-        failureMessage: true 
+        failureRedirect: '/login.html?error=auth_failed',
+        failureMessage: true,
+        session: true
     }),
     (req, res) => {
         console.log('✅ Autenticación exitosa');
-        console.log('Usuario:', req.user);
+        console.log('Usuario autenticado:', req.user);
+        console.log('Sesión ID:', req.sessionID);
+        console.log('¿Está autenticado?:', req.isAuthenticated());
+        
+        // Verificar que el usuario existe antes de redirigir
+        if (!req.user) {
+            console.log('❌ No hay usuario en la sesión');
+            return res.redirect('/login.html?error=no_user');
+        }
+        
         // Autenticación exitosa
         res.redirect('/menu.html');
     }

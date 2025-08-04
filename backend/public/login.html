@@ -157,6 +157,51 @@
     </div>
 
     <script>
+        // Verificar si hay errores en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        
+        if (error) {
+            let errorMessage = 'Error en la autenticación';
+            switch(error) {
+                case 'auth_failed':
+                    errorMessage = 'Falló la autenticación con Google. Inténtalo de nuevo.';
+                    break;
+                case 'no_user':
+                    errorMessage = 'No se pudo obtener la información del usuario.';
+                    break;
+                case 'access_denied':
+                    errorMessage = 'Acceso denegado. Debes permitir el acceso para continuar.';
+                    break;
+                default:
+                    errorMessage = `Error: ${decodeURIComponent(error)}`;
+            }
+            
+            // Mostrar error en la página
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+                <div style="
+                    background: #f8d7da;
+                    border: 1px solid #f5c6cb;
+                    color: #721c24;
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    text-align: center;
+                    font-size: 14px;
+                ">
+                    <i class="fas fa-exclamation-triangle"></i> ${errorMessage}
+                </div>
+            `;
+            
+            const loginContainer = document.querySelector('.login-container');
+            const googleBtn = document.querySelector('.google-btn');
+            loginContainer.insertBefore(errorDiv, googleBtn);
+            
+            // Limpiar la URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
         // Verificar si ya está autenticado
         fetch('/auth/user')
             .then(response => response.json())
