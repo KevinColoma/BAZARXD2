@@ -288,7 +288,7 @@ function generarFacturaPDF() {
   doc.setFont('helvetica', 'bold');
   doc.text('KG', 25, 25, { align: 'center' });
   
-  // Título del Bazar
+  // Título de la empresa
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
@@ -296,8 +296,8 @@ function generarFacturaPDF() {
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('Sistema de Gestión Bazar Variedades', 40, 28);
-  doc.text('Belleza • Estilo • Calidad • Variedad', 40, 34);
+  doc.text('Sistema de Gestión Empresarial', 40, 28);
+  doc.text('Belleza • Estilo • Calidad', 40, 34);
   
   // FACTURA en el lado derecho
   doc.setFontSize(28);
@@ -455,7 +455,7 @@ function generarFacturaPDF() {
   doc.text('Este documento es una factura válida generada electrónicamente', 105, yPos, { align: 'center' });
   
   yPos += 4;
-  doc.text('KiroGlam - Sistema de Gestión Bazar Variedades |  https://bazarxd.onrender.com ', 105, yPos, { align: 'center' });
+  doc.text('KiroGlam - Sistema de Gestión Empresarial | www.kiroglam.com', 105, yPos, { align: 'center' });
   
   // Descargar el PDF
   const nombreArchivo = `Factura_${numeroFactura}_${nombre.replace(/\s+/g, '_')}.pdf`;
