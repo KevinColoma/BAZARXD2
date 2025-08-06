@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Informe API - KiroGlam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #3498db;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .stat .number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th:first-child {
+            border-radius: 15px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 15px 0 0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .method {
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .method.GET { background: #27ae60; }
+        .method.POST { background: #3498db; }
+        .method.PUT { background: #f39c12; }
+        .method.DELETE { background: #e74c3c; }
+
+        .uri {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .description {
+            max-width: 250px;
+            line-height: 1.4;
+        }
+
+        .json-container {
+            max-width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #2c3e50;
+            border-radius: 8px;
+            padding: 15px;
+            color: #ecf0f1;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            border: 2px solid #34495e;
+        }
+
+        .json-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .json-container::-webkit-scrollbar-track {
+            background: #34495e;
+            border-radius: 4px;
+        }
+
+        .json-container::-webkit-scrollbar-thumb {
+            background: #5dade2;
+            border-radius: 4px;
+        }
+
+        .json-container::-webkit-scrollbar-thumb:hover {
+            background: #3498db;
+        }
+
+        .no-json {
+            color: #95a5a6;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .tag {
+            background: #e8f4fd;
+            color: #2980b9;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        .deprecated {
+            background: #fdeaea;
+            color: #e74c3c;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .security {
+            color: #e67e22;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .response-codes {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .response-code {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .response-code.success { background: #27ae60; }
+        .response-code.redirect { background: #f39c12; }
+        .response-code.error { background: #e74c3c; }
+
+        .footer {
+            background: white;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .legend {
+            background: #ecf0f1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                gap: 15px;
+            }
+            
+            .stat {
+                padding: 10px 15px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            
+            .json-container {
+                max-width: 250px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💎 KiroGlam API</h1>
+        <p>Informe Completo de Endpoints - Sistema de Gestión de Bazar</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <span class="number">12</span>
+                <span class="label">Endpoints</span>
+            </div>
+            <div class="stat">
+                <span class="number">4</span>
+                <span class="label">Categorías</span>
+            </div>
+            <div class="stat">
+                <span class="number">OAuth 2.0</span>
+                <span class="label">Autenticación</span>
+            </div>
+            <div class="stat">
+                <span class="number">Production</span>
+                <span class="label">Estado</span>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="method GET">GET</span>
+                <span>Obtener datos</span>
+            </div>
+            <div class="legend-item">
+                <span class="method POST">POST</span>
+                <span>Crear datos</span>
+            </div>
+            <div class="legend-item">
+                <span class="method PUT">PUT</span>
+                <span>Actualizar</span>
+            </div>
+            <div class="legend-item">
+                <span class="method DELETE">DEL</span>
+                <span>Eliminar</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🏷️ Categoría</th>
+                        <th>🔧 Método</th>
+                        <th>🌐 URI</th>
+                        <th>📝 Descripción</th>
+                        <th>🔐 Auth</th>
+                        <th>📊 Códigos</th>
+                        <th>📄 JSON Request</th>
+                        <th>✅ JSON Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- AUTENTICACIÓN -->
+                    <tr>
+                        <td>
+                            <span class="tag">🔐 Autenticación</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/auth/google</span>
+                        </td>
+                        <td class="description">
+                            Iniciar autenticación OAuth con Google. Redirige al usuario a Google para autenticación OAuth 2.0.
+                        </td>
+                        <td>
+                            <span style="color: #27ae60; font-weight: 500;">No requerida</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code redirect">302</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="no-json">Redirección a Google</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🔐 Autenticación</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/auth/google/callback</span>
+                        </td>
+                        <td class="description">
+                            Callback que recibe la respuesta de Google OAuth. Procesa el código de autorización y establece la sesión.
+                        </td>
+                        <td>
+                            <span style="color: #27ae60; font-weight: 500;">No requerida</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code redirect">302</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="no-json">Parámetros Query</div>
+                        </td>
+                        <td>
+                            <div class="no-json">Redirección a /menu.html</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🔐 Autenticación</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/auth/user</span>
+                        </td>
+                        <td class="description">
+                            Verificar estado de autenticación. Retorna información del usuario autenticado actual.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "success": true,
+  "user": {
+    "id": "108169624057227550122",
+    "name": "KevinC Blad",
+    "email": "kcoloma89@gmail.com",
+    "photo": "https://lh3.googleusercontent.com/a/...",
+    "provider": "google",
+    "accessToken": "ya29.A0AS3H6N..."
+  },
+  "nodeEnv": "production",
+  "sessionID": "abc123..."
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🔐 Autenticación</span>
+                        </td>
+                        <td>
+                            <span class="method POST">POST</span>
+                        </td>
+                        <td>
+                            <span class="uri">/auth/logout</span>
+                        </td>
+                        <td class="description">
+                            Cerrar sesión del usuario actual. Destruye la sesión y limpia las cookies.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">500</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "success": true,
+  "message": "Sesión cerrada"
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🔐 Autenticación</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/auth/debug</span>
+                        </td>
+                        <td class="description">
+                            Información de debug del sistema. Información técnica para debugging (solo desarrollo).
+                        </td>
+                        <td>
+                            <span style="color: #f39c12; font-weight: 500;">Opcional</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "environment": "production",
+  "hasClientId": true,
+  "hasClientSecret": true,
+  "callbackURL": "https://bazarxd.onrender.com/auth/google/callback",
+  "sessionConfig": {
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "lax",
+    "maxAge": 86400000
+  },
+  "currentSession": {
+    "id": "session-id",
+    "data": {...}
+  }
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- PRODUCTOS -->
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras</span>
+                        </td>
+                        <td class="description">
+                            Listar todos los productos. Obtiene la lista completa de productos del inventario.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+[
+  {
+    "_id": "64a1b2c3d4e5f6789abcdef0",
+    "descripcion": "Cartera de cuero roja",
+    "precio": 29.99,
+    "stock": 15,
+    "imagen": "https://example.com/images/cartera.jpg",
+    "categoria": "Accesorios",
+    "createdAt": "2025-08-04T12:00:00.000Z",
+    "updatedAt": "2025-08-04T12:00:00.000Z"
+  }
+]
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method POST">POST</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras</span>
+                        </td>
+                        <td class="description">
+                            Crear nuevo producto. Agrega un nuevo producto al inventario con todos los datos requeridos.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">201</span>
+                            <span class="response-code error">400</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "descripcion": "Cartera de cuero roja",
+  "precio": 29.99,
+  "stock": 15,
+  "imagen": "https://example.com/images/cartera.jpg",
+  "categoria": "Accesorios"
+}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "_id": "64a1b2c3d4e5f6789abcdef0",
+  "descripcion": "Cartera de cuero roja",
+  "precio": 29.99,
+  "stock": 15,
+  "imagen": "https://example.com/images/cartera.jpg",
+  "categoria": "Accesorios",
+  "createdAt": "2025-08-04T12:00:00.000Z",
+  "updatedAt": "2025-08-04T12:00:00.000Z"
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras/{id}</span>
+                        </td>
+                        <td class="description">
+                            Obtener producto por ID. Obtiene los detalles de un producto específico usando su ID único.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">404</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="no-json">Parámetro en URL</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "_id": "64a1b2c3d4e5f6789abcdef0",
+  "descripcion": "Cartera de cuero roja",
+  "precio": 29.99,
+  "stock": 15,
+  "imagen": "https://example.com/images/cartera.jpg",
+  "categoria": "Accesorios",
+  "createdAt": "2025-08-04T12:00:00.000Z",
+  "updatedAt": "2025-08-04T12:00:00.000Z"
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method PUT">PUT</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras/{id}</span>
+                        </td>
+                        <td class="description">
+                            Actualizar producto. Actualiza los datos de un producto existente identificado por su ID.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">400</span>
+                            <span class="response-code error">404</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "descripcion": "Cartera de cuero roja actualizada",
+  "precio": 35.99,
+  "stock": 20,
+  "imagen": "https://example.com/images/cartera-nueva.jpg",
+  "categoria": "Accesorios Premium"
+}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "_id": "64a1b2c3d4e5f6789abcdef0",
+  "descripcion": "Cartera de cuero roja actualizada",
+  "precio": 35.99,
+  "stock": 20,
+  "imagen": "https://example.com/images/cartera-nueva.jpg",
+  "categoria": "Accesorios Premium",
+  "createdAt": "2025-08-04T12:00:00.000Z",
+  "updatedAt": "2025-08-04T12:30:00.000Z"
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method DELETE">DELETE</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras/{id}</span>
+                        </td>
+                        <td class="description">
+                            Eliminar producto. Elimina un producto del inventario de forma permanente.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">404</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="no-json">Parámetro en URL</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "message": "Producto eliminado exitosamente"
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="tag">🛍️ Productos</span>
+                        </td>
+                        <td>
+                            <span class="method POST">POST</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/carteras/descontar-stock</span>
+                        </td>
+                        <td class="description">
+                            Descontar stock por venta. Reduce el stock de productos cuando se realiza una venta múltiple.
+                        </td>
+                        <td>
+                            <span class="security">🔒 Cookie de sesión</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">400</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "productos": [
+    {
+      "id": "64a1b2c3d4e5f6789abcdef0",
+      "cantidad": 2
+    },
+    {
+      "id": "64a1b2c3d4e5f6789abcdef1",
+      "cantidad": 1
+    }
+  ]
+}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "message": "Stock actualizado exitosamente",
+  "productosActualizados": [
+    {
+      "_id": "64a1b2c3d4e5f6789abcdef0",
+      "descripcion": "Cartera de cuero roja",
+      "precio": 29.99,
+      "stock": 13,
+      "imagen": "https://example.com/images/cartera.jpg"
+    }
+  ]
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- ADMINISTRACIÓN -->
+                    <tr>
+                        <td>
+                            <span class="tag">👨‍💼 Administración</span>
+                            <br>
+                            <span class="deprecated">DEPRECATED</span>
+                        </td>
+                        <td>
+                            <span class="method POST">POST</span>
+                        </td>
+                        <td>
+                            <span class="uri">/api/admin/login</span>
+                        </td>
+                        <td class="description">
+                            Login tradicional (legacy). Sistema de login tradicional con email y contraseña. <strong>OBSOLETO - Usar OAuth</strong>
+                        </td>
+                        <td>
+                            <span style="color: #27ae60; font-weight: 500;">No requerida</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                            <span class="response-code error">401</span>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "email": "admin@kiroglam.com",
+  "password": "password123"
+}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "token": "jwt_token_here",
+  "user": {
+    "_id": "64a1b2c3d4e5f6789abcdef0",
+    "nombre": "Administrador Principal",
+    "email": "admin@kiroglam.com",
+    "rol": "admin"
+  }
+}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- SISTEMA -->
+                    <tr>
+                        <td>
+                            <span class="tag">🏥 Sistema</span>
+                        </td>
+                        <td>
+                            <span class="method GET">GET</span>
+                        </td>
+                        <td>
+                            <span class="uri">/health</span>
+                        </td>
+                        <td class="description">
+                            Estado de salud del servidor. Endpoint para verificar que el servidor está funcionando correctamente.
+                        </td>
+                        <td>
+                            <span style="color: #27ae60; font-weight: 500;">No requerida</span>
+                        </td>
+                        <td class="response-codes">
+                            <span class="response-code success">200</span>
+                        </td>
+                        <td>
+                            <div class="no-json">No requiere JSON</div>
+                        </td>
+                        <td>
+                            <div class="json-container">
+{
+  "status": "OK",
+  "message": "Servidor KiroGlam funcionando correctamente",
+  "timestamp": "2025-08-04T12:00:00.000Z"
+}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>📊 Informe generado automáticamente</strong></p>
+        <p>🌐 Base URL: <strong>https://bazarxd.onrender.com</strong></p>
+        <p>📅 Fecha: <strong>Agosto 2025</strong> | 📝 Versión: <strong>1.0.0</strong></p>
+        <p>👨‍💻 Sistema: <strong>KiroGlam - Gestión de Bazar</strong></p>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #bdc3c7;">
+            <p style="font-size: 14px; color: #95a5a6;">
+                📋 <strong>Notas:</strong><br>
+                • Todos los endpoints requieren cookie de sesión excepto los de autenticación y health<br>
+                • Los códigos de respuesta mostrados son los principales, pueden existir otros<br>
+                • Los ejemplos JSON son representativos y pueden variar según los datos reales<br>
+                • El endpoint /api/admin/login está marcado como DEPRECATED
+            </p>
+        </div>
+    </div>
+</body>
+</html>

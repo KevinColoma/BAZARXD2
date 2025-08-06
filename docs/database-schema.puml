@@ -1,0 +1,120 @@
+@startuml KiroGlam Database Schema
+!theme cerulean
+
+title KiroGlam - Esquema de Base de Datos MongoDB
+
+skinparam class {
+    BackgroundColor #e1f5fe
+    BorderColor #0277bd
+    ArrowColor #0277bd
+}
+
+package "MongoDB Atlas Cluster" {
+    
+    class "Database: kiroglam" as db {
+        **Cloud Provider:** AWS
+        **Region:** us-east-1
+        **Tier:** M0 (Free)
+        **Storage:** 512 MB
+        **Connection:** SRV
+    }
+    
+    package "Collections" {
+        
+        class "admin" as admin_collection {
+            --Fields--
+            **_id:** ObjectId
+            **nombre:** String
+            **email:** String (unique)
+            **password:** String (hashed)
+            **rol:** String (default: "admin")
+            **createdAt:** Date
+            **updatedAt:** Date
+            --Indexes--
+            email: unique
+        }
+        
+        class "carteras" as carteras_collection {
+            --Fields--
+            **_id:** ObjectId
+            **descripcion:** String (required)
+            **precio:** Number (required, min: 0)
+            **stock:** Number (required, min: 0)
+            **imagen:** String (URL)
+            **categoria:** String (optional)
+            **createdAt:** Date
+            **updatedAt:** Date
+            --Indexes--
+            descripcion: text search
+        }
+        
+        class "ventas" as ventas_collection {
+            --Fields--
+            **_id:** ObjectId
+            **productos:** Array[Object]
+            **total:** Number
+            **fecha:** Date
+            **cliente:** String (optional)
+            **metodo_pago:** String
+            **usuario_id:** ObjectId (ref: admin)
+            --Nested: productos--
+            producto_id: ObjectId (ref: carteras)
+            descripcion: String
+            precio: Number
+            cantidad: Number
+            subtotal: Number
+        }
+        
+        class "sessions" as sessions_collection {
+            --Fields (express-session)--
+            **_id:** String (session ID)
+            **expires:** Date
+            **session:** Object
+            --Nested: session--
+            cookie: Object
+            passport: Object
+            user: Object (Google profile)
+        }
+    }
+}
+
+' Relaciones
+admin_collection ||--o{ ventas_collection : "usuario_id"
+carteras_collection ||--o{ ventas_collection : "productos.producto_id"
+
+note top of db
+    **Conexión String:**
+    mongodb+srv://user:pass@cluster.mongodb.net/kiroglam
+    
+    **Features Habilitadas:**
+    - SSL/TLS encryption
+    - IP Whitelist: 0.0.0.0/0
+    - Database Access Control
+    - Automatic backups
+end note
+
+note bottom of sessions_collection
+    **Configuración de Sesión:**
+    - Tiempo de vida: 24 horas
+    - Secure cookies en producción
+    - HttpOnly: true
+    - SameSite: lax
+end note
+
+note right of carteras_collection
+    **Validaciones:**
+    - Precio >= 0
+    - Stock >= 0
+    - Descripción requerida
+    - URL de imagen válida
+end note
+
+note right of ventas_collection
+    **Funcionalidad:**
+    - Reducción automática de stock
+    - Cálculo de totales
+    - Historial de ventas
+    - Generación de PDFs
+end note
+
+@enduml
