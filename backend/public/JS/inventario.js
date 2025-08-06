@@ -304,3 +304,334 @@ document.getElementById('btn-nueva-cartera').onclick = function(e) {
   e.preventDefault();
   mostrarFormularioCartera();
 }
+
+// Función para mostrar el total de stock
+async function mostrarTotalStock() {
+  try {
+    const res = await apiRequest('/carteras/total-stock');
+    const data = await res.json();
+    
+    const modalHtml = `
+      <div class="modal fade show" id="modal-total-stock" tabindex="-1" role="dialog" style="display:block; background:rgba(0,0,0,0.3);">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content" style="border-radius: 18px;">
+            <div class="modal-header" style="background: linear-gradient(90deg, #17a2b8 60%, #6c757d 100%); color: #fff;">
+              <h5 class="modal-title"><i class="fas fa-boxes"></i> Total de Stock</h5>
+              <button type="button" class="close" id="cerrar-modal-stock" style="color:#fff;">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-primary">${data.totalStock}</h2>
+                      <p>Total Unidades en Stock</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-info">${data.totalProductos}</h2>
+                      <p>Total de Productos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <h6>Stock por Producto:</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Producto</th>
+                      <th>Stock</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${data.stockPorProducto.map(p => `
+                      <tr>
+                        <td>${p.descripcion}</td>
+                        <td>${p.stock}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cerrar-modal-stock-footer">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('cerrar-modal-stock').onclick = () => {
+      document.getElementById('modal-total-stock').remove();
+    };
+    document.getElementById('cerrar-modal-stock-footer').onclick = () => {
+      document.getElementById('modal-total-stock').remove();
+    };
+  } catch (error) {
+    alert('Error al obtener el total de stock');
+  }
+}
+
+// Función para mostrar calculadora de IVA
+function mostrarCalculadoraIVA() {
+  const modalHtml = `
+    <div class="modal fade show" id="modal-iva" tabindex="-1" role="dialog" style="display:block; background:rgba(0,0,0,0.3);">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="border-radius: 18px;">
+          <div class="modal-header" style="background: linear-gradient(90deg, #28a745 60%, #20c997 100%); color: #fff;">
+            <h5 class="modal-title"><i class="fas fa-calculator"></i> Calculadora de IVA</h5>
+            <button type="button" class="close" id="cerrar-modal-iva" style="color:#fff;">
+              <span>&times;</span>
+            </button>
+          </div>
+          <form id="form-iva">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Porcentaje de IVA:</label>
+                <input type="number" class="form-control" id="porcentaje-iva" value="16" min="0" max="100" step="0.01">
+              </div>
+              <div class="form-group">
+                <label>Selecciona productos para calcular:</label>
+                <div id="productos-iva" class="border p-3" style="max-height: 300px; overflow-y: auto;">
+                  <!-- Se llenará dinámicamente -->
+                </div>
+              </div>
+              <div id="resultado-iva" style="display: none;">
+                <hr>
+                <h6>Resultado:</h6>
+                <div id="detalle-iva"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Calcular IVA</button>
+              <button type="button" class="btn btn-secondary" id="cerrar-modal-iva-footer">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // Cargar productos disponibles
+  cargarProductosParaIVA();
+  
+  document.getElementById('cerrar-modal-iva').onclick = () => {
+    document.getElementById('modal-iva').remove();
+  };
+  document.getElementById('cerrar-modal-iva-footer').onclick = () => {
+    document.getElementById('modal-iva').remove();
+  };
+  
+  document.getElementById('form-iva').onsubmit = async function(e) {
+    e.preventDefault();
+    await calcularIVA();
+  };
+}
+
+async function cargarProductosParaIVA() {
+  try {
+    const res = await apiRequest('/carteras');
+    const productos = await res.json();
+    
+    const container = document.getElementById('productos-iva');
+    container.innerHTML = productos.map(producto => `
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="${producto._id}" id="producto-${producto._id}">
+        <label class="form-check-label" for="producto-${producto._id}">
+          ${producto.descripcion} - $${producto.precio.toFixed(2)}
+        </label>
+        <input type="number" class="form-control mt-1" id="cantidad-${producto._id}" placeholder="Cantidad" min="1" value="1" style="width: 100px; display: inline-block; margin-left: 10px;">
+      </div>
+    `).join('');
+  } catch (error) {
+    alert('Error al cargar productos');
+  }
+}
+
+async function calcularIVA() {
+  try {
+    const checkboxes = document.querySelectorAll('#productos-iva input[type="checkbox"]:checked');
+    const productos = Array.from(checkboxes).map(cb => ({
+      _id: cb.value,
+      cantidad: parseInt(document.getElementById(`cantidad-${cb.value}`).value) || 1
+    }));
+    
+    if (productos.length === 0) {
+      alert('Selecciona al menos un producto');
+      return;
+    }
+    
+    const porcentajeIva = parseFloat(document.getElementById('porcentaje-iva').value);
+    
+    const res = await apiRequest('/carteras/calcular-iva', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productos, porcentajeIva })
+    });
+    
+    const data = await res.json();
+    
+    const detalleHtml = `
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio Unit.</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.productos.map(p => `
+              <tr>
+                <td>${p.descripcion}</td>
+                <td>$${p.precio.toFixed(2)}</td>
+                <td>${p.cantidad}</td>
+                <td>$${p.precioTotal.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <strong>Subtotal: $${data.subtotal}</strong>
+        </div>
+        <div class="col-md-4">
+          <strong>IVA (${data.porcentajeIva}%): $${data.iva}</strong>
+        </div>
+        <div class="col-md-4">
+          <strong class="text-success">Total: $${data.total}</strong>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('detalle-iva').innerHTML = detalleHtml;
+    document.getElementById('resultado-iva').style.display = 'block';
+  } catch (error) {
+    alert('Error al calcular IVA');
+  }
+}
+
+// Función para mostrar resumen completo
+async function mostrarResumenCompleto() {
+  try {
+    const res = await apiRequest('/carteras/resumen-completo');
+    const data = await res.json();
+    
+    const modalHtml = `
+      <div class="modal fade show" id="modal-resumen" tabindex="-1" role="dialog" style="display:block; background:rgba(0,0,0,0.3);">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content" style="border-radius: 18px;">
+            <div class="modal-header" style="background: linear-gradient(90deg, #ffc107 60%, #fd7e14 100%); color: #fff;">
+              <h5 class="modal-title"><i class="fas fa-chart-line"></i> Resumen Completo del Inventario</h5>
+              <button type="button" class="close" id="cerrar-modal-resumen" style="color:#fff;">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row mb-4">
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h3 class="text-primary">${data.stock.totalStock}</h3>
+                      <p>Total Unidades</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h3 class="text-info">${data.stock.totalProductos}</h3>
+                      <p>Total Productos</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h3 class="text-warning">${data.stock.productosBajoStock}</h3>
+                      <p>Bajo Stock</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h3 class="text-success">$${data.valores.total}</h3>
+                      <p>Valor Total (con IVA)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Valores del Inventario:</h6>
+                  <table class="table table-sm">
+                    <tr>
+                      <td>Subtotal:</td>
+                      <td class="text-right">$${data.valores.subtotal}</td>
+                    </tr>
+                    <tr>
+                      <td>IVA (${data.valores.porcentajeIva}%):</td>
+                      <td class="text-right">$${data.valores.iva}</td>
+                    </tr>
+                    <tr class="table-success">
+                      <td><strong>Total:</strong></td>
+                      <td class="text-right"><strong>$${data.valores.total}</strong></td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <h6>Alertas de Stock Bajo:</h6>
+                  ${data.alertas.productosBajoStock.length > 0 ? `
+                    <div class="alert alert-warning">
+                      <ul class="mb-0">
+                        ${data.alertas.productosBajoStock.map(p => `
+                          <li>${p.descripcion}: ${p.stock} unidades</li>
+                        `).join('')}
+                      </ul>
+                    </div>
+                  ` : '<p class="text-success">No hay productos con stock bajo</p>'}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cerrar-modal-resumen-footer">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('cerrar-modal-resumen').onclick = () => {
+      document.getElementById('modal-resumen').remove();
+    };
+    document.getElementById('cerrar-modal-resumen-footer').onclick = () => {
+      document.getElementById('modal-resumen').remove();
+    };
+  } catch (error) {
+    alert('Error al obtener el resumen completo');
+  }
+}
+
+// Event listeners para los nuevos botones
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('btn-total-stock').onclick = mostrarTotalStock;
+  document.getElementById('btn-calcular-iva').onclick = mostrarCalculadoraIVA;
+  document.getElementById('btn-resumen-completo').onclick = mostrarResumenCompleto;
+});
