@@ -192,7 +192,7 @@ body {
   font-weight: bold;
   padding: 12px 40px;
   transition: background 0.2s, color 0.2s;
-}
+} 
 .btn-factura:hover {
   background: #e2cfcf;
   color: #6d4c4c;
