@@ -17,14 +17,35 @@ router.post('/', async (req, res) => {
 
 // Editar una cartera
 router.put('/:id', async (req, res) => {
-  const cartera = await Cartera.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(cartera);
+  try {
+    console.log('PUT /carteras/:id - ID:', req.params.id);
+    console.log('PUT /carteras/:id - Body:', req.body);
+    
+    const cartera = await Cartera.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!cartera) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    res.json(cartera);
+  } catch (error) {
+    console.error('Error en PUT /carteras/:id:', error);
+    res.status(500).json({ error: 'Error al actualizar producto: ' + error.message });
+  }
 });
 
 // Eliminar una cartera
 router.delete('/:id', async (req, res) => {
-  await Cartera.findByIdAndDelete(req.params.id);
-  res.sendStatus(204);
+  try {
+    console.log('DELETE /carteras/:id - ID:', req.params.id);
+    
+    const cartera = await Cartera.findByIdAndDelete(req.params.id);
+    if (!cartera) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    res.status(204).json({ message: 'Producto eliminado correctamente' });
+  } catch (error) {
+    console.error('Error en DELETE /carteras/:id:', error);
+    res.status(500).json({ error: 'Error al eliminar producto: ' + error.message });
+  }
 });
 
 // NUEVO: Descontar stock al generar factura

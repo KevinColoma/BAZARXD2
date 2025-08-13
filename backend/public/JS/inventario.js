@@ -222,17 +222,26 @@ function mostrarFormularioEditarCartera(cartera) {
       stock: parseInt(form.stock.value),
       imagen: form.imagen.value
     };
-    const res = await apiRequest(`/carteras/${cartera._id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(carteraEditada)
-    });
-    if(res.ok) {
-      alert('Cartera actualizada');
-      document.getElementById('modal-editar-cartera').remove();
-      cargarCarteras(); // Recargar datos sin reload de página
-    } else {
-      alert('Error al actualizar producto');
+    
+    try {
+      const res = await apiRequest(`/carteras/${cartera._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(carteraEditada)
+      });
+      
+      if(res.ok) {
+        alert('Producto actualizado correctamente');
+        document.getElementById('modal-editar-cartera').remove();
+        cargarCarteras(); // Recargar datos sin reload de página
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Error del servidor:', errorData);
+        alert('Error al actualizar producto: ' + (errorData.message || 'Error desconocido'));
+      }
+    } catch (error) {
+      console.error('Error de conexión al actualizar producto:', error);
+      alert('Error de conexión al actualizar producto. Verifica tu conexión a internet.');
     }
   };
 }
@@ -240,14 +249,15 @@ function mostrarFormularioEditarCartera(cartera) {
 // Función para editar producto
 async function editarCartera(id) {
   try {
-    const res = await fetch('http://localhost:4000/api/carteras');
+    const res = await apiRequest('/carteras');
     const data = await res.json();
     const cartera = data.find(c => c._id === id);
     if (cartera) {
       mostrarFormularioEditarCartera(cartera);
     }
   } catch (error) {
-    alert('Error al cargar los datos de la producto');
+    console.error('Error al cargar los datos del producto:', error);
+    alert('Error al cargar los datos del producto');
   }
 }
 
@@ -255,50 +265,23 @@ async function editarCartera(id) {
 async function eliminarCartera(id) {
   if (confirm('¿Seguro que deseas eliminar este producto?')) {
     try {
-      const res = await fetch(`http://localhost:4000/api/carteras/${id}`, {
+      const res = await apiRequest(`/carteras/${id}`, {
         method: 'DELETE'
       });
       if(res.ok) {
-        alert('Cartera eliminada');
+        alert('Producto eliminado correctamente');
         cargarCarteras(); // Recargar datos sin reload de página
       } else {
-        alert('Error al eliminar producto');
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Error del servidor:', errorData);
+        alert('Error al eliminar producto: ' + (errorData.message || 'Error desconocido'));
       }
     } catch (error) {
-      alert('Error de conexión al eliminar producto');
+      console.error('Error de conexión al eliminar producto:', error);
+      alert('Error de conexión al eliminar producto. Verifica tu conexión a internet.');
     }
   }
 }
-
-// Evento para mostrar el modal de editar al hacer click en el ícono de editar
-document.addEventListener('click', function(e) {
-  if (e.target.closest('.fa-pen-to-square')) {
-    const id = e.target.closest('.fa-pen-to-square').getAttribute('data-id');
-    fetch('http://localhost:4000/api/carteras')
-      .then(res => res.json())
-      .then(data => {
-        const cartera = data.find(c => c._id === id);
-        if (cartera) mostrarFormularioEditarCartera(cartera);
-      });
-  }
-  // Evento para eliminar producto
-  if (e.target.closest('.fa-trash')) {
-    const id = e.target.closest('.fa-trash').getAttribute('data-id');
-    if (confirm('¿Seguro que deseas eliminar este producto?')) {
-      fetch(`http://localhost:4000/api/carteras/${id}`, {
-        method: 'DELETE'
-      })
-      .then(res => {
-        if(res.ok) {
-          alert('Cartera eliminada');
-          location.reload();
-        } else {
-          alert('Error al eliminar producto');
-        }
-      });
-    }
-  }
-});
 
 document.getElementById('btn-nueva-cartera').onclick = function(e) {
   e.preventDefault();
