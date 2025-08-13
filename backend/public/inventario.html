@@ -10,6 +10,18 @@
 </head>
 <body>
   <div class="container">
+    <!-- Información del usuario autenticado -->
+    <div class="user-info mb-3" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">
+      <img class="user-photo" src="" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;">
+      <div style="display: inline-block; vertical-align: middle;">
+        <div class="user-name" style="font-weight: bold; color: #2e7d32;">Cargando...</div>
+        <div class="user-email" style="font-size: 0.9em; color: #666;">Verificando autenticación...</div>
+      </div>
+      <button class="btn btn-sm logout-btn" style="background: #dc3545; color: white; margin-left: 15px;">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+    
     <h2 class="text-center mt-4 mb-4" style="color:#8d5c5c; font-weight:bold;">INVENTARIO</h2>
     
     <!-- Barra de búsqueda y botón agregar -->
@@ -75,6 +87,10 @@
     </div>
     
   </div>
+  
+  <!-- Incluir el manager de autenticación -->
+  <script src="JS/auth-manager.js"></script>
+  <script src="JS/oauth-utils.js"></script>
   <script src="JS/api-config.js"></script>
   <script src="JS/inventario.js"></script>
 </body>
