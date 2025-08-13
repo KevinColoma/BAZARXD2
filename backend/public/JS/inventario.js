@@ -11,7 +11,7 @@ async function cargarCarteras() {
     mostrarCarteras(carterasFiltradas);
     configurarBusqueda();
   } catch (err) {
-    document.getElementById('tbody-carteras').innerHTML = '<tr><td colspan="5" class="text-center">No se pudo cargar el inventario</td></tr>';
+    document.getElementById('tbody-carteras').innerHTML = '<tr><td colspan="4" class="text-center">No se pudo cargar el inventario</td></tr>';
   }
 }
 
@@ -40,7 +40,6 @@ function mostrarCarteras(data) {
                style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 2px 2px 8px rgba(141,92,92,0.3);">
         </td>
         <td><strong style="color: #6d4c4c;">${cartera.descripcion}</strong></td>
-        <td><span style="color: #28a745; font-weight: bold; font-size: 1.1rem;">$${cartera.precio.toFixed(2)}</span></td>
         <td id="stock-${cartera._id}" class="${stockClass}">
           ${stockIcon}${cartera.stock} ${cartera.stock <= 5 ? '(Bajo)' : ''}
         </td>
